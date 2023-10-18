@@ -4,7 +4,49 @@
 #include <3ds.h>
 
 #include "fg_circle.h"
-#include "bg_buttons.h"
+#include "bg_button.h"
+
+void render_view(
+		C3D_RenderTarget* target,
+		int positions_x[4],
+		int positions_y[4],
+		int index_raised,
+		int offset,
+		C2D_Image image_bg_button,
+		int size_bg_button,
+		C2D_Image image_fg_circle,
+		int size_fg_circle,
+		bool shift_flag
+) {
+	C2D_TargetClear(target, C2D_Color32(0xff, 0xff, 0xff, 0xff));
+	C2D_SceneBegin(target);
+
+	for (int i = 0; i < 4; i++) {
+
+		C2D_DrawImageAt(
+			image_bg_button,
+			positions_x[i] - (size_bg_button / 2),
+			positions_y[i] - (size_bg_button / 2),
+			0
+		);
+
+		int shift = 0;
+		if (i == index_raised) {
+			if (shift_flag) {
+				shift = -((offset+1) / 2);
+			} else {
+				shift = offset / 2;
+			}
+		}
+
+		C2D_DrawImageAt(
+			image_fg_circle,
+			positions_x[i] - (size_fg_circle / 2) + shift,
+			positions_y[i] - (size_fg_circle / 2),
+			0
+		);
+	}
+}
 
 int main() {
 	int WIDTH_SCREEN_UPPER = 400;
@@ -13,10 +55,10 @@ int main() {
 	int POSITION_SCREEN_CENTER_X = WIDTH_SCREEN_UPPER / 2;
 	int POSITION_SCREEN_CENTER_Y = HEIGHT_SCREEN_UPPER / 2;
 
-	int SIZE_BG_BUTTONS = 240;
+	int SIZE_BG_BUTTON = 100;
 	int SIZE_FG_CIRCLE = 50;
 
-	int POSITION_BG_BUTTONS_X = (WIDTH_SCREEN_UPPER - SIZE_BG_BUTTONS) / 2;
+	// int POSITION_BG_BUTTONS_X = (WIDTH_SCREEN_UPPER - SIZE_BG_BUTTONS) / 2;
 
 	int POSITION_FG_CIRCLE_CENTER_OFFSET = 70;
 
@@ -46,9 +88,9 @@ int main() {
 	C3D_RenderTarget* right;
 	
 	C2D_SpriteSheet sheet_fg_circle;
-	C2D_SpriteSheet sheet_bg_buttons;
+	C2D_SpriteSheet sheet_bg_button;
 	C2D_Image image_fg_circle;
-	C2D_Image image_bg_buttons;
+	C2D_Image image_bg_button;
 
 	int keysD;
 	int keysH;
@@ -80,8 +122,8 @@ int main() {
 	image_fg_circle = C2D_SpriteSheetGetImage(sheet_fg_circle, 0);
 
 	// Lead bg_buttons
-	sheet_bg_buttons = C2D_SpriteSheetLoad("romfs:/gfx/bg_buttons.t3x");
-	image_bg_buttons = C2D_SpriteSheetGetImage(sheet_bg_buttons, 0);
+	sheet_bg_button = C2D_SpriteSheetLoad("romfs:/gfx/bg_button.t3x");
+	image_bg_button = C2D_SpriteSheetGetImage(sheet_bg_button, 0);
 
 	while (aptMainLoop()) {
 		// Handle user input
@@ -110,62 +152,38 @@ int main() {
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
 		// Render the left eye's view
-		{
-			C2D_TargetClear(left, C2D_Color32(0xff, 0xff, 0xff, 0xff));
-			C2D_SceneBegin(left);
-
-			C2D_DrawImageAt(image_bg_buttons, POSITION_BG_BUTTONS_X, 0, 0);
-
-			for (int i = 0; i < 4; i++) {
-				int shift = 0;
-				if (i == index_raised) {
-					shift = offset / 2;
-				}
-
-				C2D_DrawImageAt(
-					image_fg_circle,
-					POSITIONS_FG_CIRCLE_BASE_X[i] - (SIZE_FG_CIRCLE / 2) + shift,
-					POSITIONS_FG_CIRCLE_BASE_Y[i] - (SIZE_FG_CIRCLE / 2),
-					0
-				);
-			}
-
-			// ScreenWidth - (faceWidth / 2) + offset for 3D
-			// C2D_DrawImageAt(image_fg_circle, 100 + offsetUpper * slider, 30, 0);		
-			// C2D_DrawImageAt(image_fg_circle, 100 + offsetLower * slider, 140, 0);
-		}
+		render_view(
+			left,
+			POSITIONS_FG_CIRCLE_BASE_X,
+			POSITIONS_FG_CIRCLE_BASE_Y,
+			index_raised,
+			offset,
+			image_bg_button,
+			SIZE_BG_BUTTON,
+			image_fg_circle,
+			SIZE_FG_CIRCLE,
+			false
+		);
 
 		// Render the right eye's view
-		{
-			C2D_TargetClear(right, C2D_Color32(0xff, 0xff, 0xff, 0xff));
-			C2D_SceneBegin(right);
-
-			C2D_DrawImageAt(image_bg_buttons, POSITION_BG_BUTTONS_X, 0, 0);
-
-			for (int i = 0; i < 4; i++) {
-				int shift = 0;
-				if (i == index_raised) {
-					shift = (offset+1) / 2;
-				}
-
-				C2D_DrawImageAt(
-					image_fg_circle,
-					POSITIONS_FG_CIRCLE_BASE_X[i] - (SIZE_FG_CIRCLE / 2) - shift,
-					POSITIONS_FG_CIRCLE_BASE_Y[i] - (SIZE_FG_CIRCLE / 2),
-					0
-				);
-			}
-
-			// ScreenWidth - (faceWidth / 2) - offset for 3D
-			// C2D_DrawImageAt(image_fg_circle, 100 - offsetUpper * slider, 30, 0);
-			// C2D_DrawImageAt(image_fg_circle, 100 - offsetLower * slider, 140, 0);
-		}
+		render_view(
+			right,
+			POSITIONS_FG_CIRCLE_BASE_X,
+			POSITIONS_FG_CIRCLE_BASE_Y,
+			index_raised,
+			offset,
+			image_bg_button,
+			SIZE_BG_BUTTON,
+			image_fg_circle,
+			SIZE_FG_CIRCLE,
+			true
+		);
 
 		C3D_FrameEnd(0);
 	}
 
 	C2D_SpriteSheetFree(sheet_fg_circle);
-	C2D_SpriteSheetFree(sheet_bg_buttons);
+	C2D_SpriteSheetFree(sheet_bg_button);
 
 	// De-initialize libraries
 	C2D_Fini();
