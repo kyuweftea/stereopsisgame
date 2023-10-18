@@ -13,6 +13,6 @@ Based on: https://github.com/devkitPro/3ds-examples/tree/master/graphics/gpu/ste
 
 1. Get a Nintendo 3DS with the Homebrew Lancher app. (You can install custom firmware and homebrew to your 3DS with [this guide](https://3ds.hacks.guide/).)
 2. Ensure your Nintendo 3DS and PC are on the same network.
-3. On your 3DS, launch the Homebrew Lancher.
+3. On your 3DS, launch the Homebrew Launcher.
 4. Press the Y button to open the network launcher.
 5. On your PC, execute `$DEVKITPRO/tools/bin/3dslink stereopsisgame.3dsx`.
