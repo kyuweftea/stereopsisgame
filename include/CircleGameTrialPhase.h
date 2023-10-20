@@ -10,8 +10,8 @@ class CircleGameTrialPhase : public Phase {
     CircleGameTrialPhase(
         C3D_RenderTarget* left,
         C3D_RenderTarget* right,
-        C2D_Image& image_fg_circle,
-        C2D_Image& image_bg_button,
+        C2D_Image* image_fg_circle,
+        C2D_Image* image_bg_button,
         int offset_i
     );
 
@@ -31,6 +31,7 @@ class CircleGameTrialPhase : public Phase {
     int offset_i;
     int offset;
     int index_raised;
+    int slide_rand[4];
 };
 
 #endif

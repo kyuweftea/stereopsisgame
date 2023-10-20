@@ -61,7 +61,7 @@ void CircleGamePhase::enter() {
 	this->image_bg_button = C2D_SpriteSheetGetImage(sheet_bg_button, 0);
 
     this->trial = new CircleGameTrialPhase(
-        this->left, this->right, this->image_fg_circle, this->image_bg_button, 0
+        this->left, this->right, &(this->image_fg_circle), &(this->image_bg_button), 0
     );
     this->trial->enter();
 }

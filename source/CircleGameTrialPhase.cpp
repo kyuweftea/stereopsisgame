@@ -1,5 +1,6 @@
 #include <citro2d.h>
 #include <3ds.h>
+#include <stdlib.h>
 
 #include "Phase.h"
 #include "CircleGamePhase.h"
@@ -8,25 +9,32 @@
 CircleGameTrialPhase::CircleGameTrialPhase(
         C3D_RenderTarget* left,
         C3D_RenderTarget* right,
-        C2D_Image& image_fg_circle,
-        C2D_Image& image_bg_button,
+        C2D_Image* image_fg_circle,
+        C2D_Image* image_bg_button,
         int offset_i
 ) {
     this->left = left;
     this->right = right;
 
-    *(this->image_fg_circle) = image_fg_circle;
-    *(this->image_bg_button) = image_bg_button;
+    this->image_fg_circle = image_fg_circle;
+    this->image_bg_button = image_bg_button;
 
     this->offset_i = offset_i;
     this->offset = CircleGamePhase::OFFSETS[offset_i];
 }
 
 void CircleGameTrialPhase::enter() {
-    // TODO determine random index_raised
 
 	// which raised circle
-	this->index_raised = 2;
+	this->index_raised = rand() % 4;
+
+    for (int i = 0; i < 4; i++) {
+        if (i == this->index_raised) {
+            this->slide_rand[i] = rand() % (13 - this->offset) - (6 - ((this->offset+1) / 2));
+        } else {
+            this->slide_rand[i] = rand() % 13 - 6;
+        }   
+    }
 }
 
 Phase* CircleGameTrialPhase::update() {
@@ -58,18 +66,18 @@ Phase* CircleGameTrialPhase::update() {
     // if (keysD & KEY_DRIGHT || keysH & KEY_DUP) this->offset++;
     // if (keysD & KEY_DLEFT || keysH & KEY_DDOWN) this->offset--;
 
-    if (keysD & KEY_B) {
+    if (keysD & CircleGamePhase::DIRECTIONS_KEYS[this->index_raised]) {
         int next_offset_i = this->offset_i+1;
         
         if (next_offset_i >= 30) return nullptr;
         // if (true) return nullptr;
 
-        this->offset_i = next_offset_i;
-        this->offset = CircleGamePhase::OFFSETS[this->offset_i];
+        // this->offset_i = next_offset_i;
+        // this->offset = CircleGamePhase::OFFSETS[this->offset_i];
         
-        // return new CircleGameTrialPhase(
-        //     this->left, this->right, *this->image_fg_circle, *this->image_bg_button, next_offset_i
-        // );
+        return new CircleGameTrialPhase(
+            this->left, this->right, this->image_fg_circle, this->image_bg_button, next_offset_i
+        );
     }
 
     // for (int i = 0; i < 4; i++) {
@@ -99,12 +107,12 @@ void CircleGameTrialPhase::render_view(C3D_RenderTarget* target, bool shift_flag
 			0
 		);
 
-		int shift = 0;
+		int shift = this->slide_rand[i];
 		if (i == this->index_raised) {
 			if (shift_flag) {
-				shift = -((this->offset+1) / 2);
+				shift -= (this->offset+1) / 2;
 			} else {
-				shift = this->offset / 2;
+				shift += this->offset / 2;
 			}
 		}
 
