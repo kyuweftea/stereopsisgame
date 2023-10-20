@@ -10,20 +10,8 @@ class CircleGamePhase : public Phase {
     void enter();
     Phase* update();
     void exit();
-  private:
-    void render_view(C3D_RenderTarget* target, bool shift_flag);
 
-    // Targets for left and right eye respectively
-    C3D_RenderTarget* left;
-    C3D_RenderTarget* right;
-    
-    C2D_SpriteSheet sheet_fg_circle;
-	C2D_SpriteSheet sheet_bg_button;
-	C2D_Image image_fg_circle;
-	C2D_Image image_bg_button;
-
-    int offset;
-    int index_raised;
+    static const int OFFSETS[30];
 
 	static const int WIDTH_SCREEN_UPPER;
 	static const int HEIGHT_SCREEN_UPPER;
@@ -41,6 +29,18 @@ class CircleGamePhase : public Phase {
 	static const int POSITIONS_FG_CIRCLE_BASE_Y[4];
 
 	static const int DIRECTIONS_KEYS[4];
+  private:
+
+    // Targets for left and right eye respectively
+    C3D_RenderTarget* left;
+    C3D_RenderTarget* right;
+    
+    C2D_SpriteSheet sheet_fg_circle;
+	C2D_SpriteSheet sheet_bg_button;
+	C2D_Image image_fg_circle;
+	C2D_Image image_bg_button;
+
+    Phase* trial;
 };
 
 #endif
